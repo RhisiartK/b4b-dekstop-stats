@@ -1,6 +1,4 @@
 import { useEffect } from 'react'
-import Link from 'next/link'
-import Layout from '../components/Layout'
 
 const IndexPage = () => {
   useEffect(() => {
@@ -15,9 +13,7 @@ const IndexPage = () => {
   }
 
   return (
-    <Layout title="Back 4 Blood - Realtime Stats">
-
-    </Layout>
+    <div>Hi sadsa d</div>
   )
 }
 

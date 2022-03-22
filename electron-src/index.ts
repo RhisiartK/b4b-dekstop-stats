@@ -3,7 +3,7 @@ import { join } from 'path'
 import { format } from 'url'
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent, Menu } from 'electron'
+import { app, BrowserWindow, ipcMain, IpcMainEvent, Menu } from 'electron'
 import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 
@@ -30,11 +30,11 @@ app.on('ready', async () => {
   const url = isDev
     ? 'http://localhost:8000/'
     : format({
-        pathname: join(__dirname, '../renderer/out/index.html'),
-        protocol: 'file:',
-        slashes: true,
-      })
-
+      pathname: join(__dirname, '../renderer/out/index.html'),
+      protocol: 'file:',
+      slashes: true,
+    })
+  mainWindow.webContents.openDevTools()
   mainWindow.loadURL(url)
 })
 
