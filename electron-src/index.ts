@@ -3,13 +3,19 @@ import { join } from 'path'
 import { format } from 'url'
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron'
+import { BrowserWindow, app, ipcMain, IpcMainEvent, Menu } from 'electron'
 import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 
+Menu.setApplicationMenu(null)
+
 // Prepare the renderer once the app is ready
 app.on('ready', async () => {
+  console.log('Prepare next')
+
   await prepareNext('./renderer')
+
+  console.log('Next is prepared')
 
   const mainWindow = new BrowserWindow({
     width: 800,

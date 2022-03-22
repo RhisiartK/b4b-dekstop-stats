@@ -23,16 +23,16 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => (
         <Link href="/about">
           <a>About</a>
         </Link>{' '}
-        |{' '}
-        <Link href="/initial-props">
-          <a>With Initial Props</a>
-        </Link>
+        {/*|{' '}*/}
+        {/*<Link href="/initial-props">*/}
+        {/*  <a>With Initial Props</a>*/}
+        {/*</Link>*/}
       </nav>
     </header>
     {children}
     <footer>
-      <hr />
-      <span>I'm here to stay (Footer)</span>
+      {/*<hr />*/}
+      {/*<span>I'm here to stay (Footer)</span>*/}
     </footer>
   </div>
 )
