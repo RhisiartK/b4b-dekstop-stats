@@ -84,7 +84,7 @@ const Layout = ({ children }: Props) => {
         // fixed prop on AppShell will be automatically added to Header and Navbar
         fixed
         header={<Header height={60}>
-          <Container style={{ height: '60px', alignItems: 'center', display: 'flex' }}>
+          <Container fluid style={{ height: '60px', alignItems: 'center', display: 'flex' }}>
             <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
               <Burger
                 opened={opened}
@@ -105,7 +105,7 @@ const Layout = ({ children }: Props) => {
           // when viewport size is less than theme.breakpoints.sm navbar width is 100%
           // viewport size > theme.breakpoints.sm – width is 300px
           // viewport size > theme.breakpoints.lg – width is 400px
-                        width={{ sm: 300, lg: 400 }}>
+                        width={{ sm: 200, lg: 300 }}>
           <Navbar.Section>
             {links}
           </Navbar.Section>

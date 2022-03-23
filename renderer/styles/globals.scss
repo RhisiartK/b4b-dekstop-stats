@@ -1,3 +1,21 @@
 body {
   font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
 }
+
+h3 {
+  display: inline-block;
+  margin-left: 1rem;
+}
+
+.h-8 {
+  height: 28px;
+}
+
+.w-8 {
+  width: 28px;
+}
+
+code, kbd {
+  margin: .5rem 0;
+  display: inline-block;
+}
