@@ -1,8 +1,12 @@
-const AboutPage = () => (
+import { Center, Title } from '@mantine/core'
+import React from 'react'
+
+const About = () => (
   <>
-    <h1>About</h1>
-    <p>This is the about page</p>
+    <Center style={{ width: '100%', marginBottom: '1em' }}>
+      <Title order={1}>About</Title>
+    </Center>
   </>
 )
 
-export default AboutPage
+export default About

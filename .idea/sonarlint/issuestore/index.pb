@@ -1,8 +1,6 @@
 
 7
 LICENSE,0\3\0398ccd0f49298b10a3d76a47800d2ebecd49859
-H
-renderer/pages/about.tsx,7\4\74fef53aa0d6c4b53f7e1c1018d91efde2f90dd0
 O
 renderer/public/images/xbox.svg,0\f\0f298b8416f4c339767910df32a3ceb03c3a233e
 P

@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useState } from 'react'
+import React, { ReactNode, useContext, useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   AppShell,
@@ -16,13 +16,13 @@ import {
   UnstyledButton,
   useMantineTheme
 } from '@mantine/core'
-import { InfoCircle, Settings, User } from 'tabler-icons-react'
+import { Home, InfoCircle, Settings, User } from 'tabler-icons-react'
 import { AppContext } from '../utils/appContext'
+import { useRouter } from 'next/router'
 
 type Props = {
   children: ReactNode
   title?: string
-  statsFileFound: boolean
   loadingStatsAutomatically: boolean
 }
 
@@ -31,9 +31,10 @@ interface MainLinkProps {
   color: string;
   label: string;
   href: string
+  current?: boolean
 }
 
-function MainLink ({ icon, color, label, href }: MainLinkProps) {
+function MainLink ({ icon, color, label, href, current }: MainLinkProps) {
   return (
     <UnstyledButton
       sx={(theme) => ({
@@ -42,10 +43,11 @@ function MainLink ({ icon, color, label, href }: MainLinkProps) {
         padding: theme.spacing.xs,
         borderRadius: theme.radius.sm,
         color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-
+        backgroundColor:
+          current ? theme.colors.dark[4] : 'transparent',
         '&:hover': {
           backgroundColor:
-            theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+            theme.colorScheme === 'dark' ? (current ? theme.colors.dark[4] : theme.colors.dark[6]) : theme.colors.gray[0],
         },
       })}
     >
@@ -65,17 +67,75 @@ function MainLink ({ icon, color, label, href }: MainLinkProps) {
 }
 
 const Layout = ({ children }: Props) => {
-  const data = [
-    { icon: <Settings size={16}/>, color: 'blue', label: 'Settings', href: '/' },
-    { icon: <User size={16}/>, color: 'blue', label: 'Player stats', href: '/player' },
-    { icon: <InfoCircle size={16}/>, color: 'grape', label: 'About', href: '/about' },
-  ]
+  const router = useRouter()
+  const { loading, pathExists } = useContext(AppContext)
 
-  const links = data.map((link) => <MainLink {...link} key={link.label}/>)
+  const [links, setLinks] = useState([])
+
+  let data = []
+
+  useEffect(() => {
+    if (pathExists) {
+      data.push(
+        {
+          icon: <Home size={16}/>,
+          color: 'blue',
+          label: 'Home',
+          href: '/',
+          current: router.pathname === '/'
+        },
+        {
+          icon: <User size={16}/>,
+          color: 'blue',
+          label: 'Player stats',
+          href: '/player',
+          current: router.pathname === '/player'
+        },
+        {
+          icon: <Settings size={16}/>,
+          color: 'blue',
+          label: 'Settings',
+          href: '/settings',
+          current: router.pathname === '/settings'
+        },
+        {
+          icon: <InfoCircle size={16}/>,
+          color: 'grape',
+          label: 'About',
+          href: '/about',
+          current: router.pathname === '/about'
+        },
+      )
+    } else {
+      data.push(
+        {
+          icon: <Home size={16}/>,
+          color: 'blue',
+          label: 'Home',
+          href: '/',
+          current: router.pathname === '/'
+        },
+        {
+          icon: <Settings size={16}/>,
+          color: 'blue',
+          label: 'Settings',
+          href: '/settings',
+          current: router.pathname === '/settings'
+        },
+        {
+          icon: <InfoCircle size={16}/>,
+          color: 'grape',
+          label: 'About',
+          href: '/about',
+          current: router.pathname === '/about'
+        }
+      )
+    }
+    setLinks(data.map((link) => <MainLink {...link} key={link.label}/>))
+  }, [pathExists, router.pathname])
+
   const [opened, setOpened] = useState(false)
   const theme = useMantineTheme()
-
-  const { loading } = useContext(AppContext)
 
   return (
     <MantineProvider
@@ -103,7 +163,7 @@ const Layout = ({ children }: Props) => {
                   mr="xl"
                 />
               </MediaQuery>
-              <Title order={1} style={{ display: 'inline-block' }}>B4B - Realtime Stats</Title>
+              <Title order={1} style={{ display: 'inline-block' }}>B4B - Desktop Stats - v0.1.0</Title>
             </Container>
           </Header>}
           navbar={<Navbar p="md"

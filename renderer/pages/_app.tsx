@@ -10,35 +10,50 @@ export default function _app (props: AppProps) {
   const { Component, pageProps } = props
 
   const [loadingStatsAutomatically, setLoadingStatsAutomatically] = useState(true)
-  const [statsFileFound, setStatsFileFound] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [pathExists, setPathExists] = useState(false)
+  const [statsFilePath, setStatsFilePath] = useState<string>()
   const router = useRouter()
 
   useEffect(() => {
     // After component loaded, we try to load the stats file automatically for better UX
-    global.ipcRenderer.send('loadStatsFile')
+    global.ipcRenderer.send('watchStats')
+    setLoading(true)
     // If stats file loaded we redirect the user to the player stats page
-    global.ipcRenderer.on('loadStatsFileSuccess', () => {
+    global.ipcRenderer.on('watchStatsSuccess', (_event, data: { path: string }) => {
       setLoadingStatsAutomatically(false)
-      setStatsFileFound(true)
-      router.push('/player')
+      setPathExists(true)
+      setStatsFilePath(data.path)
+      setLoading(false)
     })
-    global.ipcRenderer.on('loadStatsFileError', () => {
+    global.ipcRenderer.on('watchStatsError', () => {
       setLoadingStatsAutomatically(false)
-      setStatsFileFound(false)
+      setPathExists(false)
+      setStatsFilePath(undefined)
+      setLoading(false)
+    })
+    global.ipcRenderer.on('resetConfigSuccess', () => {
+      setPathExists(false)
+      setStatsFilePath(undefined)
     })
   }, [])
 
   return (
-    <AppContext.Provider value={{ loading: loading, setLoading: (loadingState) => setLoading(loadingState) }}>
+    <AppContext.Provider value={{
+      loading: loading,
+      pathExists: pathExists,
+      statsFilePath: statsFilePath,
+      setLoading: (loadingState) => setLoading(loadingState),
+      setStatsFilePath: (statsFilePathState) => setStatsFilePath(statsFilePathState),
+      setPathExists: (pathExistsState) => setPathExists(pathExistsState)
+    }}>
       <Head>
-        <title>Back 4 Blood - Realtime Stats</title>
+        <title>Back 4 Blood - Desktop Stats</title>
         <meta charSet="utf-8"/>
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width"/>
       </Head>
-      <Layout statsFileFound={statsFileFound} loadingStatsAutomatically={loadingStatsAutomatically}>
-        <Component {...pageProps} statsFileFound={statsFileFound}
-                   loadingStatsAutomatically={loadingStatsAutomatically}/>
+      <Layout loadingStatsAutomatically={loadingStatsAutomatically}>
+        <Component {...pageProps} loadingStatsAutomatically={loadingStatsAutomatically}/>
       </Layout>
     </AppContext.Provider>
   )
