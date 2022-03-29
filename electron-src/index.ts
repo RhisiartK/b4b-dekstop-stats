@@ -91,8 +91,49 @@ ipcMain.on('save', (event: IpcMainEvent, data: { type: 'level' | 'player' | 'dec
 })
 
 const playerStatPath = join(app.getPath('userData'), '\\Saves', 'player2.json')
+const configPath = join(app.getPath('userData'), '\\Saves', 'config.json')
 
-ipcMain.on('getPlayerStat', (_event: IpcMainEvent) => {
-  console.log('Check file exist')
-  console.log(fs.existsSync(playerStatPath))
+ipcMain.on('loadStatsFile', (event: IpcMainEvent) => {
+  console.log('Check config exist')
+  if (fs.existsSync(configPath)) {
+    // TODO read config
+  }
+
+  if (fs.existsSync(playerStatPath)) {
+    event.sender.send('loadStatsFileSuccess')
+  } else {
+    event.sender.send('loadStatsFileError')
+  }
+
+})
+
+// FINd PATH
+ipcMain.on('findPath', (event, data: { type: string }) => {
+  const pathBase = join(app.getPath('home'), '\\AppData\\Local\\Back4Blood\\')
+  let path: string | undefined
+  let found = false
+  switch (data.type) {
+    case 'steam':
+      found = fs.existsSync(join(pathBase, 'Steam\\Saved\\SaveGames\\PlayerProfileSettings.json'))
+      path = join(pathBase, 'Steam\\Saved\\SaveGames\\PlayerProfileSettings.json')
+      break
+    case 'epic':
+      found = fs.existsSync(join(pathBase, 'Epic\\Saved\\SaveGames\\PlayerProfileSettings.json'))
+      path = join(pathBase, 'Epic\\Saved\\SaveGames\\PlayerProfileSettings.json')
+      break
+    case 'xbox':
+      break
+    default:
+      break
+  }
+
+  if (found) {
+    setTimeout(() => {
+      event.sender.send('findPathSuccess', { path: path })
+    }, 1000)
+  } else {
+    setTimeout(() => {
+      event.sender.send('findPathError')
+    }, 1000)
+  }
 })

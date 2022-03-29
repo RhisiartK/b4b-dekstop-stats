@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Dropzone, DropzoneStatus } from '@mantine/dropzone'
 import { File, Icon as TablerIcon, Upload, X } from 'tabler-icons-react'
-import { Code, Divider, Group, Kbd, MantineTheme, Text, useMantineTheme } from '@mantine/core'
+import { Center, Code, Group, List, MantineTheme, Text, ThemeIcon, Title, useMantineTheme } from '@mantine/core'
 import { jsonUtils } from '../utils/utils'
+import { AppContext } from '../utils/appContext'
 
 function getIconColor (status: DropzoneStatus, theme: MantineTheme) {
   return status.accepted
@@ -44,10 +45,14 @@ export const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) =>
   </Group>
 )
 
-const IndexPage = () => {
-  const [findFileAutomatically, setFindFileAutomatically] = useState(false)
-
+const IndexPage: React.FC<{ loadingStatsAutomatically: boolean }> = ({
+  loadingStatsAutomatically
+}) => {
+  const { setLoading } = useContext(AppContext)
   const theme = useMantineTheme()
+  const [path, setPath] = useState<string>()
+  const [triedFindPath, setTriedFindPath] = useState(false)
+  const [selectedStore, setSelectedStore] = useState<string>()
 
   const [damageInflected, setDamageInflected] = useState<Array<number>>([])
   const [latestJson, setLatestJson] = useState<number | null>(null)
@@ -84,68 +89,139 @@ const IndexPage = () => {
     })
   }, [])
 
-  return (
+  const Icon: React.FC<{ color?: string, gradient?: string, type: 'steam' | 'epic' | 'xbox' | 'file' }> = ({
+    color,
+    type,
+    gradient
+  }) => {
+    let css = {}
+    if (gradient !== undefined) {
+      css = {
+        backgroundImage: gradient
+      }
+    } else if (color) {
+      css = {
+        backgroundColor: color
+      }
+    }
+
+    return (
+      <ThemeIcon size={28} radius="xl" sx={css} style={{ marginTop: '.5em' }}>
+        {type === 'steam' &&
+          <img src="/images/steam.svg" alt="Steam" className="h-8 w-8"/>}
+        {type === 'epic' && <img src="/images/epic_games.svg" alt="Steam" className="h-8 w-8"/>}
+        {type === 'xbox' && <img src="/images/xbox.svg" alt="Steam" className="h-8 w-8"/>}
+        {type === 'file' && <File/>}
+      </ThemeIcon>
+    )
+  }
+
+  const onClickStore = (event: React.MouseEvent<HTMLLIElement>) => {
+    setSelectedStore(event.currentTarget.dataset['type'])
+    setTriedFindPath(false)
+    // Try to locate the statistics file
+    if (event.currentTarget.dataset['type'] === 'file') {
+      setTriedFindPath(true)
+    } else {
+      setLoading(true)
+      global.ipcRenderer.send('findPath', { type: event.currentTarget.dataset['type'] })
+    }
+    global.ipcRenderer.once('findPathSuccess', (_event, data: { path: string }) => {
+      setLoading(false)
+      setPath(data.path)
+      setTriedFindPath(true)
+    })
+    global.ipcRenderer.once('findPathError', () => {
+      setLoading(false)
+      setTriedFindPath(true)
+    })
+  }
+
+  return loadingStatsAutomatically === true ? (
+    <Center style={{ height: '100%', width: '100%' }}>
+      <Title order={1}>Trying to load stats automatically...</Title>
+    </Center>
+  ) : (
     <div>
-      <p>To display your statistics, you need to extract them, please follow instructions below.</p>
+      <Center style={{ width: '100%', marginBottom: '1em' }}>
+        <Title order={1}>Settings</Title>
+      </Center>
+      {path === undefined && <>
+        <Title order={2} style={{ marginBottom: '.5em' }}>1. Select your game store or read from file</Title>
+        <List style={{ display: 'inline-block' }}>
+          <List.Item icon={Icon({ gradient: 'linear-gradient(#00adee, #000000)', type: 'steam' })}
+                     onClick={onClickStore}
+                     data-type="steam" style={{ cursor: 'pointer' }}>
+            <Center style={{ height: '36px' }}><Text size={'xl'} weight={'bold'}>Steam</Text></Center>
+          </List.Item>
+          <List.Item icon={Icon({ color: '#107C10', type: 'xbox' })} onClick={onClickStore} data-type="xbox"
+                     style={{ cursor: 'pointer' }}>
+            <Center style={{ height: '36px' }}><Text size={'xl'} weight={'bold'}>Xbox Game Pass</Text></Center>
+          </List.Item>
+          <List.Item icon={Icon({ color: '#2F2D2E', type: 'epic' })} onClick={onClickStore} data-type="epic"
+                     style={{ cursor: 'pointer' }}>
+            <Center style={{ height: '36px' }}><Text size={'xl'} weight={'bold'}>Epic Games Store</Text></Center>
+          </List.Item>
+          <List.Item icon={Icon({ color: '#2F2D2E', type: 'file' })} onClick={onClickStore} data-type="file"
+                     style={{ cursor: 'pointer' }}>
+            <Center style={{ height: '36px' }}><Text size={'xl'} weight={'bold'}>File</Text></Center>
+          </List.Item>
+        </List>
+        {triedFindPath && <>
+          <Title order={2} style={{ marginBottom: '.5em', marginTop: '.5em' }}>2. Locate your statistics file</Title>
+          {selectedStore === 'steam' && <>
+            <div className="my-6">
+              <Text>By default, you should find your statistics file at path:</Text>
+              <Code
+                color={'red'} style={{
+                fontWeight: 'bold',
+                padding: '1em'
+              }}>{'<disk>:\\Users\\<username>\\AppData\\Local\\Back4Blood\\Steam\\Saved\\SaveGames\\PlayerProfileSettings.json'}</Code>
+            </div>
+          </>}
+          {selectedStore === 'xbox' && <>
+            <div className="my-6">
+              <Text>Please note that Xbox Game Pass stores your files differently (within sub folders), so you'll have
+                to try
+                several files until you have it displayed.</Text>
+              <Text>By default, you should find your statistics file somewhere in:</Text>
+              <Code
+                color={'red'} style={{
+                fontWeight: 'bold',
+                padding: '1em'
+              }}>{'<disk>:\\Users\\<username>\\AppData\\Local\\Packages\\WarnerBros.Interactive.<some key>\\SystemAppData\\wgs\\'}</Code>
+            </div>
+          </>}
+          {selectedStore === 'epic' && <>
+            <div className="my-6">
+              <Text>By default, you should find your statistics file at:</Text>
+              <Code
+                color={'red'} style={{
+                fontWeight: 'bold',
+                padding: '1em'
+              }}>{'<disk>:\\Users\\<username>\\AppData\\Local\\Back4Blood\\Epic\\Saved\\SaveGames\\PlayerProfileSettings.json'}</Code>
+            </div>
+          </>}
+          <div className="text-sm mt-6">
+            <Text>Please note that Windows hide some folders by default (AppData being one of them), if you can't see
+              it, show hidden folders in your Windows settings.</Text>
+          </div>
 
-      <div className="my-6">
-        <div className="flex">
-          <img src="/images/steam.svg" alt="Steam" className="h-8 w-8"/>
-          <h3 className="text-3xl ml-2">Steam</h3>
-        </div>
-
-        If you play the game through Steam, you should find your statistics file at path:
-        <br/>
-        <Code><b>{'<disk>:\\Users\\<username>\\AppData\\Local\\Back4Blood\\Steam\\Saved\\SaveGames\\PlayerProfileSettings.json'}</b></Code>
-      </div>
-
-      <Divider variant="dashed"/>
-
-      <div className="my-6">
-        <div className="flex">
-          <img src="/images/xbox.svg" alt="Xbox Game Pass" className="h-8 w-8"/>
-          <h3 className="text-3xl ml-2">Xbox Game Pass</h3>
-        </div>
-
-        If you play the game through Xbox Game Pass, you should find your statistics file somewhere in:
-        <br/>
-        <Kbd
-          className="color-primary color-bg-secondary"><b>{'<disk>:\\Users\\<username>\\AppData\\Local\\Packages\\WarnerBros.Interactive.<some key>\\SystemAppData\\wgs\\'}</b></Kbd>
-        <br/>
-        Please note that Xbox Game Pass stores your files differently (within sub folders), so you'll have to try
-        several files until you have it displayed.
-      </div>
-
-      <Divider variant="dashed"/>
-
-      <div className="my-6">
-        <div className="flex">
-          <img src="/images/epic_games.svg" alt="Epic Games" className="h-8 w-8"/>
-          <h3 className="text-3xl ml-2">Epic Games Store</h3>
-        </div>
-
-        If you play the game through Epic Games Store, you should find your statistics file at:
-        <br/>
-        <Kbd
-          className="color-primary color-bg-secondary"><b>{'<disk>:\\Users\\<username>\\AppData\\Local\\Back4Blood\\Epic\\Saved\\SaveGames\\PlayerProfileSettings.json'}</b></Kbd>
-      </div>
-
-      <Divider variant="dashed"/>
-
-      <div className="text-sm mt-6">
-        <p>
-          Please note that Windows hide some folders by default (AppData being one of them), if you can't see it, show
-          hidden folders in your Windows settings.
-        </p>
-      </div>
-
-      <Dropzone
-        onDrop={acceptedFile}
-        onReject={(files) => console.log('rejected files', files)}
-        maxSize={3 * 1024 ** 2}
-      >
-        {(status) => dropzoneChildren(status, theme)}
-      </Dropzone>
+          <Dropzone
+            onDrop={acceptedFile}
+            onReject={(files) => console.log('rejected files', files)}
+            maxSize={3 * 1024 ** 2}
+            style={{ marginTop: '.5em' }}
+          >
+            {(status) => dropzoneChildren(status, theme)}
+          </Dropzone>
+        </>}
+      </>}
+      {path !== undefined && <>
+        <Title order={2} style={{ marginBottom: '.5em', marginTop: '.5em' }}>Currently used statistic file</Title>
+        <Title order={3} style={{ marginBottom: '.5em', marginTop: '.5em' }}>{selectedStore}</Title>
+        <Code>{path}</Code>
+      </>}
     </div>
   )
 }
