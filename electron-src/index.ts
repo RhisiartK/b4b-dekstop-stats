@@ -1,5 +1,5 @@
 // Native
-import { join } from 'path'
+import { dirname, join } from 'path'
 import { format } from 'url'
 
 // Packages
@@ -58,15 +58,41 @@ ipcMain.on('message', (event: IpcMainEvent, message: any) => {
 
 let readInterval: null | NodeJS.Timeout = null
 
-ipcMain.on('path', (event: IpcMainEvent, jsonPath: string) => {
-  console.log(jsonPath)
+ipcMain.on('path', (event: IpcMainEvent, jsonPaths: { path1: string, path2: string }) => {
+  console.log(jsonPaths)
   if (readInterval !== null) {
     clearInterval(readInterval)
   }
   readInterval = setInterval(() => {
-    let json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'))
-    console.log('READ')
-    event.sender.send('json', json)
+    let json = JSON.parse(fs.readFileSync(jsonPaths.path1, 'utf-8'))
+    let json2 = JSON.parse(fs.readFileSync(jsonPaths.path2, 'utf-8'))
+    // console.log('READ')
+    event.sender.send('json', { json1: json, json2: json2 })
   }, 6000)
 
+})
+
+function ensureDirectoryExistence (filePath: string) {
+  const dirName = dirname(filePath)
+  console.log(dirName)
+  if (fs.existsSync(dirName)) {
+    return true
+  }
+  ensureDirectoryExistence(dirName)
+  fs.mkdirSync(dirName)
+}
+
+ipcMain.on('save', (event: IpcMainEvent, data: { type: 'level' | 'player' | 'deck', json: any }) => {
+  console.log(join(app.getPath('userData'), '\\Saves'))
+  // console.log(data)
+  ensureDirectoryExistence(join(app.getPath('userData'), '\\Saves', data.type + '.json'))
+  fs.writeFileSync(join(app.getPath('userData'), '\\Saves', data.type + '.json'), JSON.stringify(data.json))
+  event.sender.send('saveSuccess')
+})
+
+const playerStatPath = join(app.getPath('userData'), '\\Saves', 'player2.json')
+
+ipcMain.on('getPlayerStat', (_event: IpcMainEvent) => {
+  console.log('Check file exist')
+  console.log(fs.existsSync(playerStatPath))
 })

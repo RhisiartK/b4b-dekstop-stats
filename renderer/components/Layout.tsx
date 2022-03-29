@@ -15,7 +15,7 @@ import {
   UnstyledButton,
   useMantineTheme
 } from '@mantine/core'
-import { Home, InfoCircle } from 'tabler-icons-react'
+import { Home, InfoCircle, User } from 'tabler-icons-react'
 
 type Props = {
   children: ReactNode
@@ -63,6 +63,7 @@ function MainLink ({ icon, color, label, href }: MainLinkProps) {
 const Layout = ({ children }: Props) => {
   const data = [
     { icon: <Home size={16}/>, color: 'blue', label: 'Home', href: '/' },
+    { icon: <User size={16}/>, color: 'blue', label: 'Player stats', href: '/player' },
     { icon: <InfoCircle size={16}/>, color: 'grape', label: 'About', href: '/about' },
   ]
 

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Dropzone, DropzoneStatus } from '@mantine/dropzone'
-import { Icon as TablerIcon, Photo, Upload, X } from 'tabler-icons-react'
+import { File, Icon as TablerIcon, Upload, X } from 'tabler-icons-react'
 import { Code, Divider, Group, Kbd, MantineTheme, Text, useMantineTheme } from '@mantine/core'
+import { jsonUtils } from '../utils/utils'
 
 function getIconColor (status: DropzoneStatus, theme: MantineTheme) {
   return status.accepted
@@ -25,7 +26,7 @@ function ImageUploadIcon ({
     return <X {...props} />
   }
 
-  return <Photo {...props} />
+  return <File {...props} />
 }
 
 export const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) => (
@@ -34,33 +35,32 @@ export const dropzoneChildren = (status: DropzoneStatus, theme: MantineTheme) =>
 
     <div>
       <Text size="xl" inline>
-        Drag images here or click to select files
+        Drag your stat file here or click to select the file
       </Text>
       <Text size="sm" color="dimmed" inline mt={7}>
-        Attach as many files as you like, each file should not exceed 5mb
+        To find your stat file, please follow the instructions above
       </Text>
     </div>
   </Group>
 )
 
 const IndexPage = () => {
+  const [findFileAutomatically, setFindFileAutomatically] = useState(false)
+
   const theme = useMantineTheme()
 
   const [damageInflected, setDamageInflected] = useState<Array<number>>([])
-  const [latestDamageInflected, setLatestDamageInflected] = useState<number | null>(null)
+  const [latestJson, setLatestJson] = useState<number | null>(null)
 
   useEffect(() => {
-    if (latestDamageInflected !== null) {
+    if (latestJson !== null) {
       if (damageInflected.length === 0) {
-        setDamageInflected([latestDamageInflected])
-        console.log('BASE DAMAGE INFLECTED', latestDamageInflected)
-      } else if (damageInflected[damageInflected.length - 1] < latestDamageInflected) {
-        setDamageInflected([...damageInflected, latestDamageInflected])
-        console.log('CHANGED DAMAGE INFLECTED', latestDamageInflected)
-        console.log('LATEST DAMAGE INFLECTED', latestDamageInflected - damageInflected[damageInflected.length - 1])
+        setDamageInflected([latestJson])
+      } else if (damageInflected[damageInflected.length - 1] < latestJson) {
+        setDamageInflected([...damageInflected, latestJson])
       }
     }
-  }, [latestDamageInflected])
+  }, [latestJson])
 
   const acceptedFile = (files) => {
     console.log(files[0].path)
@@ -68,21 +68,21 @@ const IndexPage = () => {
 
     global.ipcRenderer.send('path', jsonPath)
     global.ipcRenderer.on('json', (_event, json: any) => {
-      console.log('READ')
-      setLatestDamageInflected(json.offlineData.stats.enemyDamageInflicted.base)
+      setLatestJson(json)
     })
   }
 
   useEffect(() => {
-    // add a listener to 'message' channel
-    global.ipcRenderer.addListener('message', (_event, args) => {
-      alert(args)
+    const devPath = 'C:\\Users\\krics\\Desktop\\json test\\PlayerProfileSettings_1.json'
+    const devPath2 = 'C:\\Users\\krics\\Desktop\\json test\\PlayerProfileSettings_2.json'
+    global.ipcRenderer.send('path', { path1: devPath, path2: devPath2 })
+    global.ipcRenderer.on('json', (_event, jsons: any) => {
+      setLatestJson(jsons.json1)
+      jsonUtils.jsonChanges(jsons.json1, jsons.json2)
+
+      // global.ipcRenderer.send('save', { type: 'player', json: jsons.json1 })
     })
   }, [])
-
-  const onSayHiClick = () => {
-    global.ipcRenderer.send('message', 'hi from next')
-  }
 
   return (
     <div>
