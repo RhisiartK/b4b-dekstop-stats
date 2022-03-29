@@ -36,33 +36,30 @@ interface MainLinkProps {
 
 function MainLink ({ icon, color, label, href, current }: MainLinkProps) {
   return (
-    <UnstyledButton
-      sx={(theme) => ({
-        display: 'block',
-        width: '100%',
-        padding: theme.spacing.xs,
-        borderRadius: theme.radius.sm,
-        color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-        backgroundColor:
-          current ? theme.colors.dark[4] : 'transparent',
-        '&:hover': {
+    <Link href={href}>
+      <UnstyledButton
+        sx={(theme) => ({
+          display: 'block',
+          width: '100%',
+          padding: theme.spacing.xs,
+          borderRadius: theme.radius.sm,
+          color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
           backgroundColor:
-            theme.colorScheme === 'dark' ? (current ? theme.colors.dark[4] : theme.colors.dark[6]) : theme.colors.gray[0],
-        },
-      })}
-    >
-      <Link href={href}>
+            current ? theme.colors.dark[4] : 'transparent',
+          '&:hover': {
+            backgroundColor:
+              theme.colorScheme === 'dark' ? (current ? theme.colors.dark[4] : theme.colors.dark[6]) : theme.colors.gray[0],
+          },
+        })}
+      >
         <Group>
           <ThemeIcon color={color} variant="light">
             {icon}
           </ThemeIcon>
-
-
           <Text size="sm">{label}</Text>
         </Group>
-      </Link>
-
-    </UnstyledButton>
+      </UnstyledButton>
+    </Link>
   )
 }
 

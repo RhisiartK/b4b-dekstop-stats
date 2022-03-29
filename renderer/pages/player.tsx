@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useMantineTheme } from '@mantine/core'
+import { Center, Title, useMantineTheme } from '@mantine/core'
 import { jsonUtils } from '../utils/utils'
 
 const Player = () => {
@@ -12,9 +12,11 @@ const Player = () => {
   }, [])
 
   return (
-    <div>
-      <p>Player stat</p>
-    </div>
+    <>
+      <Center style={{ width: '100%', marginBottom: '1em' }}>
+        <Title order={1}>Player stats</Title>
+      </Center>
+    </>
   )
 }
 
