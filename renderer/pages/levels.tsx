@@ -17,6 +17,7 @@ const Levels = () => {
       if (PlayerProfileSettings.hasNewMissionCompleted(stats, latestStat)) {
         console.log('CHANGED SOMETHING')
         setDiffStat(PlayerProfileSettings.subtract(latestStat, stats))
+        setStats(latestStat)
       }
     }
   }, [latestStat])
@@ -45,7 +46,7 @@ const Levels = () => {
   return (
     <>
       <Center style={{ width: '100%', marginBottom: '3em' }}>
-        <Title order={1}>Latest Mission Stats</Title>
+        <Title order={1}>Latest Completed Mission</Title>
       </Center>
       {diffStat !== undefined && <>
         <Center>
