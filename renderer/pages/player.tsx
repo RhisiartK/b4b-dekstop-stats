@@ -7,7 +7,8 @@ const Player = () => {
 
   useEffect(() => {
     global.ipcRenderer.on('json', (_event, jsons: any) => {
-      jsonUtils.jsonChanges(jsons.json1, jsons.json2)
+      // jsonUtils.jsonToPlayerStats(jsons.json1, jsons.json2, jsons.json)
+      jsonUtils.jsonToPlayerStats(jsons.json)
     })
   }, [])
 

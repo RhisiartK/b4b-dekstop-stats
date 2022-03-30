@@ -89,6 +89,13 @@ const Layout = ({ children }: Props) => {
           current: router.pathname === '/player'
         },
         {
+          icon: <User size={16}/>,
+          color: 'blue',
+          label: 'Levels',
+          href: '/levels',
+          current: router.pathname === '/levels'
+        },
+        {
           icon: <Settings size={16}/>,
           color: 'blue',
           label: 'Settings',
