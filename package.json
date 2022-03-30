@@ -1,7 +1,13 @@
 {
   "private": true,
   "main": "main/index.js",
+  "name": "b4b-desktop-app",
   "productName": "B4B Desktop Stats",
+  "description": "Desktop application for Back 4 Blood fans",
+  "author": {
+    "name": "Richárd Kéki"
+  },
+  "version": "0.1.0",
   "scripts": {
     "clean": "rimraf dist main renderer/out renderer/.next",
     "dev": "npm run build-electron && electron .",
