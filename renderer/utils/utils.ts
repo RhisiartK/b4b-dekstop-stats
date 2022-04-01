@@ -458,7 +458,7 @@ const difficultyMap = new Map([
   ['hard', 'Nightmare'],
   ['pvp', 'Pvp']
 ])
-const getLatestMission = (missions1: BarSongsHeard, missions2: BarSongsHeard): LatestMission => {
+const getLatestMission = (missions1: BarSongsHeard, missions2: BarSongsHeard): LatestMission | undefined => {
   if (missions1.base - missions2.base === 0) {
     return undefined
   }
@@ -471,14 +471,20 @@ const getLatestMission = (missions1: BarSongsHeard, missions2: BarSongsHeard): L
     }
   })
 
-  const { missionName, actName } = missionNameMap.get(latestKey[0])
-
-  return {
-    mission: { id: latestKey[0], text: missionName },
-    cleaner: { id: latestKey[2], text: cleanerMap.get(latestKey[2]) },
-    difficulty: { id: latestKey[1], text: difficultyMap.get(latestKey[1]) },
-    act: { id: actName, text: actName }
+  if (latestKey !== undefined && latestKey.length === 3) {
+    const mission = missionNameMap.get(latestKey[0])
+    if (mission !== undefined) {
+      const { missionName, actName } = mission
+      return {
+        mission: { id: latestKey[0], text: missionName },
+        cleaner: { id: latestKey[2], text: cleanerMap.get(latestKey[2]) ?? '' },
+        difficulty: { id: latestKey[1], text: difficultyMap.get(latestKey[1]) ?? '' },
+        act: { id: actName, text: actName }
+      }
+    }
   }
+
+  return undefined
 }
 
 export class PlayerProfileSettings {
@@ -570,7 +576,7 @@ const jsonUtils = {
     // TODO unlocked stuffs
     // TODO consumables = burn cards
 
-    const playerStats = new PlayerProfileSettings({
+    return new PlayerProfileSettings({
       supplyPoints: _supplyPoints.acquired + _supplyPoints.balanceFromInventory - _supplyPoints.spent,
       skullTotemPoints: _skullTotemPoints.acquired - _skullTotemPoints.spent,
       decks: _decks.map((deck: JsonDeck) => {
@@ -610,7 +616,6 @@ const jsonUtils = {
         rawData: _stats.missionsCompleted_Secured
       }
     })
-    return playerStats
   }
 }
 

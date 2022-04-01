@@ -91,7 +91,14 @@ const Layout = ({ children }: Props) => {
         {
           icon: <User size={16}/>,
           color: 'blue',
-          label: 'Levels',
+          label: 'Progressions',
+          href: '/progressions',
+          current: router.pathname === '/progressions'
+        },
+        {
+          icon: <User size={16}/>,
+          color: 'blue',
+          label: 'Latest Completed Mission',
           href: '/levels',
           current: router.pathname === '/levels'
         },

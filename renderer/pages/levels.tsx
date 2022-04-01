@@ -11,12 +11,16 @@ const Levels = () => {
 
   useEffect(() => {
     if (stats === undefined) {
-      console.log('FIRST READ')
+      console.log('FIRST STATS')
       setStats(latestStat)
     } else {
-      if (PlayerProfileSettings.hasNewMissionCompleted(stats, latestStat)) {
-        console.log('CHANGED SOMETHING')
+      if (stats && latestStat && PlayerProfileSettings.hasNewMissionCompleted(stats, latestStat)) {
+        console.log('CHANGED')
         setDiffStat(PlayerProfileSettings.subtract(latestStat, stats))
+      }
+      if (stats && latestStat && (stats._stats.enemyDamageInflicted !== latestStat._stats.enemyDamageInflicted || stats._stats.timesIncappedAsCleaner !== latestStat._stats.timesIncappedAsCleaner || stats._stats.timesDiedAsCleaner !== latestStat._stats.timesDiedAsCleaner)) {
+        console.log('SOMETHING CHANGED')
+        console.log(stats._stats.enemyDamageInflicted, latestStat._stats.enemyDamageInflicted, stats._stats.timesIncappedAsCleaner, latestStat._stats.timesIncappedAsCleaner, stats._stats.timesDiedAsCleaner, latestStat._stats.timesDiedAsCleaner, stats._supplyPoints, latestStat._supplyPoints)
         setStats(latestStat)
       }
     }
@@ -31,7 +35,6 @@ const Levels = () => {
       const playerStat2 = jsonUtils.jsonToPlayerStats(jsons.json2)
       // setDiffStat(PlayerProfileSettings.subtract(playerStat2, playerStat1))
 
-      // TODO check diff
       // TODO save level
 
       setLatestStat(playerStat)

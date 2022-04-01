@@ -7,6 +7,7 @@ import { app, BrowserWindow, ipcMain, IpcMainEvent, Menu } from 'electron'
 import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
 import * as fs from 'fs'
+import { StatsJson } from '../renderer/utils/utils'
 
 Menu.setApplicationMenu(null)
 
@@ -86,9 +87,8 @@ ipcMain.on('watchStats', (event: IpcMainEvent) => {
         let json1 = JSON.parse(fs.readFileSync(devPath, 'utf-8'))
         let json2 = JSON.parse(fs.readFileSync(devPath2, 'utf-8'))
 
-        let json: undefined | JSON
+        let json: undefined | StatsJson
         json = JSON.parse(fs.readFileSync(jsonConfig.path, 'utf-8'))
-        console.log('READ')
 
         event.sender.send('json', { json1: json1, json2: json2, json: json })
       }, 6000)

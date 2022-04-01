@@ -1,6 +1,6 @@
 {
   "private": true,
-  "main": "main/index.js",
+  "main": "main/electron-src/index.js",
   "name": "b4b-desktop-app",
   "productName": "B4B Desktop Stats",
   "description": "Desktop application for Back 4 Blood fans",
