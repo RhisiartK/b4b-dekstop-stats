@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Center, Title, useMantineTheme } from '@mantine/core'
+import { Center, Image, Title, useMantineTheme } from '@mantine/core'
 import { jsonUtils, PlayerProfileSettings } from '../utils/utils'
 
 const Progressions = () => {
@@ -19,6 +19,7 @@ const Progressions = () => {
       <Center style={{ width: '100%', marginBottom: '1em' }}>
         <Title order={1}>Progressions</Title>
       </Center>
+      <Image src={'./images/difficulties/hard.webp'} height={250} fit={'contain'} width={'auto'}/>
     </>
   )
 }

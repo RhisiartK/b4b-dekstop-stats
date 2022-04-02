@@ -51,6 +51,7 @@ export default function _app (props: AppProps) {
         <title>Back 4 Blood - Desktop Stats</title>
         <meta charSet="utf-8"/>
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width"/>
+        <base href="./"/>
       </Head>
       <Layout loadingStatsAutomatically={loadingStatsAutomatically}>
         <Component {...pageProps} loadingStatsAutomatically={loadingStatsAutomatically}/>

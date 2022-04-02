@@ -47,6 +47,9 @@
     "files": [
       "main",
       "renderer/out"
-    ]
+    ],
+    "directories": {
+      "buildResources": "renderer/out"
+    }
   }
 }

@@ -25,14 +25,14 @@ app.on('ready', async () => {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: false,
-      preload: join(__dirname, 'preload.js'),
+      preload: join(__dirname, 'preload.js')
     },
   })
 
   const url = isDev
     ? 'http://localhost:8000/'
     : format({
-      pathname: join(__dirname, '../renderer/out/index.html'),
+      pathname: join(__dirname, '../../renderer/out/index.html'),
       protocol: 'file:',
       slashes: true,
     })
@@ -74,8 +74,8 @@ ipcMain.on('watchStats', (event: IpcMainEvent) => {
     if (jsonConfig && jsonConfig.path && fs.existsSync(jsonConfig.path)) {
       console.log('STATS EXISTS')
       // TODO DEV
-      const devPath = 'C:\\Users\\krics\\Desktop\\json test\\PlayerProfileSettings_1.json'
-      const devPath2 = 'C:\\Users\\krics\\Desktop\\json test\\PlayerProfileSettings_2.json'
+      // const devPath = 'C:\\Users\\krics\\Desktop\\json test\\PlayerProfileSettings_1.json'
+      // const devPath2 = 'C:\\Users\\krics\\Desktop\\json test\\PlayerProfileSettings_2.json'
 
       if (readInterval !== null) {
         clearInterval(readInterval)
@@ -84,13 +84,14 @@ ipcMain.on('watchStats', (event: IpcMainEvent) => {
         // TODO Save level if file changed and send levelAdded event
 
         // TODO DEV
-        let json1 = JSON.parse(fs.readFileSync(devPath, 'utf-8'))
-        let json2 = JSON.parse(fs.readFileSync(devPath2, 'utf-8'))
+        // let json1 = JSON.parse(fs.readFileSync(devPath, 'utf-8'))
+        // let json2 = JSON.parse(fs.readFileSync(devPath2, 'utf-8'))
 
         let json: undefined | StatsJson
         json = JSON.parse(fs.readFileSync(jsonConfig.path, 'utf-8'))
 
-        event.sender.send('json', { json1: json1, json2: json2, json: json })
+        // event.sender.send('json', { json1: json1, json2: json2, json: json })
+        event.sender.send('json', { json: json })
       }, 6000)
 
       setTimeout(() => {
